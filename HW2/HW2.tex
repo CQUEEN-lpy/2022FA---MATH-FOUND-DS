@@ -1,1 +1,1099 @@
-1
+
+\documentclass[11pt,letterpaper]{article}
+\textwidth 6.5in
+\textheight 9.in
+\oddsidemargin 0in
+\headheight 0in
+\usepackage{graphicx}
+\usepackage{fancybox}
+\usepackage[utf8]{inputenc}
+\usepackage{epsfig,graphicx}
+\usepackage{multicol,pst-plot}
+\usepackage{ragged2e}
+\usepackage{pstricks}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{eucal}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+\pagestyle{empty}
+\usepackage{tcolorbox}
+\usepackage{lipsum}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{enumerate}
+\usepackage{subfigure}
+
+\DeclareMathOperator{\tr}{Tr}
+\newcommand*{\op}[1]{\check{\mathbf#1}}
+\newcommand{\bra}[1]{\langle #1 |}
+\newcommand{\ket}[1]{| #1 \rangle}
+\newcommand{\braket}[2]{\langle #1 | #2 \rangle}
+\newcommand{\mean}[1]{\langle #1 \rangle}
+\newcommand{\opvec}[1]{\check{\vec #1}}
+\renewcommand{\sp}[1]{$${\begin{split}#1\end{split}}$$}
+
+\usepackage{parskip}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+	backgroundcolor=\color{backcolour},   
+	commentstyle=\color{codegreen},
+	keywordstyle=\color{magenta},
+	numberstyle=\tiny\color{codegray},
+	stringstyle=\color{codepurple},
+	basicstyle=\footnotesize,
+	breakatwhitespace=false,         
+	breaklines=true,                 
+	captionpos=b,                    
+	keepspaces=true,                 
+	numbers=left,                    
+	numbersep=5pt,                  
+	showspaces=false,                
+	showstringspaces=false,
+	showtabs=false,                  
+	tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\begin{document}
+\pagestyle{plain}
+
+\begin{flushleft}
+Student Name: Xinxi Zhang\\
+NetID: XZ657  \\
+RUID: 219004759
+\end{flushleft}
+
+\begin{flushright}\vspace{-15mm}
+\includegraphics[height=2cm]{Rutgers_Logo.png}
+\end{flushright}
+ 
+\begin{center}\vspace{-1cm}
+\textbf{\large MATH FOUND DS (16:198:501)}\\
+Homework 2: Optimization
+\end{center}
+
+ 
+\rule{\linewidth}{0.1mm}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\bigskip
+\bigskip
+\textbf{\large Problem 1: Momentum Methods and Descent Directions}\\
+
+\begin{flushleft}
+    Consider a function:
+    \begin{align}
+        F(\underline x) = \frac{1}{2} \underline x^T Q \underline x - \underline x^T \underline c
+    \end{align}
+    where $\underline x$ and $\underline c$ are real vectors of dimension $D$, and Q is a real symmetric $D \times D$ matrix.
+\end{flushleft}
+
+
+\begin{tcolorbox}
+\begin{flushleft}
+    \textbf{Questions:} 
+    \begin{enumerate}
+        \item Show that $\nabla_{\underline x}F(\underline x) = Q\underline x - \underline c$ 
+        \begin{flushleft}
+            From HW1, we have that:
+            \begin{align*}
+                \nabla_{\underline x} [\underline x^T \underline c] = \underline c,\quad
+                \nabla_{\underline x} [\underline x^T Q \underline x] = 2Q\underline x, \quad
+                \text{($Q$ is a real symmetric matrix)}
+            \end{align*}
+            \begin{align*}
+                \Rightarrow \quad \nabla_{\underline x}F(\underline x) &= \frac{1}{2} \nabla_{\underline x} [\underline x^T Q \underline x]
+                +  \nabla_{\underline x} [\underline x^T \underline c] \\
+                &= Q\underline x - \underline c
+            \end{align*}
+        \end{flushleft}
+
+        \item Show that if $Q$ is positive definite, then $F$ has a unique minimizer given by $\underline x^* = Q^{-1} \underline c$
+        \begin{flushleft}
+            Let:
+            \begin{align*}
+                Q = Q^T = \begin{bmatrix}
+                         - & \underline Q_1^T & -\\
+                         - & \underline Q_2^T & -\\
+                         - & \dots & -\\
+                         - & \underline Q_d^T & -\\
+                    \end{bmatrix}
+            \end{align*}
+            \begin{align*}
+                \Rightarrow \quad
+                \nabla_{\underline x}F(\underline x) = \begin{bmatrix}
+                          \underline Q_1^T \cdot \underline x \\
+                          \underline Q_2^T \cdot \underline x  \\
+                          \dots \\
+                          \underline Q_D^T \cdot \underline x  \\
+                    \end{bmatrix}
+                = \begin{bmatrix}
+                           \underline x^T \underline Q_1\\
+                           \underline x^T \underline Q_2 \\
+                          \dots \\
+                           \underline x^T  \underline Q_D\\
+                    \end{bmatrix}
+            \end{align*}
+            \begin{align*}
+                \Rightarrow \quad
+                H(F(\underline x)) &= \nabla_{\underline x}[\nabla_{\underline x}F(\underline x)]\\
+                &=   \begin{bmatrix}
+                         | & | & | & | \\
+                         \nabla_{\underline x}[\underline x^T \underline Q_1] & 
+                         \nabla_{\underline x}[\underline x^T \underline Q_2] & 
+                         \dots & 
+                         \nabla_{\underline x}[\underline x^T \underline Q_D] \\
+                         | & | & | & |
+                    \end{bmatrix}\\
+                &=\begin{bmatrix}
+                         | & | & | & | \\
+                         \underline Q_1 & 
+                         \underline Q_2 & 
+                         \dots & 
+                         \underline Q_D \\
+                         | & | & | & |
+                    \end{bmatrix} = Q
+            \end{align*}
+        \end{flushleft}
+    \end{enumerate}
+\end{flushleft}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}
+    \begin{flushleft}
+    \justifying
+        So, we know that $H(F(\underline x))$ is positive definite meaning that $F(\underline x)$ is convex through every directions of every dimension. \\
+        Therefore, we can conclude that $F$ has a unique minimizer when $\nabla_{\underline x}F(\underline x) = 0$, which is 
+        $\underline x^* = Q^{-1} \underline c$.
+    \end{flushleft}
+\end{tcolorbox}
+
+
+\begin{flushleft}
+    \justifying
+    Traditionally, gradient descent updates take the form:
+    \begin{align}
+        \underline x_{k+1} = \underline x_k - \alpha_k \nabla F(\underline x_k)
+    \end{align}
+    We occasionally modify this by modifying the descent direction. \textbf{Momentum Methods} include an additional descent direction term:
+    \begin{align}
+        \underline x_{k+1} = \underline x_k - \alpha_k \nabla F(\underline x_k)
+        + \beta_k(\underline x_k - \underline x_{k-1})
+    \end{align}
+    At step $k$, this moves the iterate from $k$ to $k + 1$ slightly in the direction it moved from $k - 1$ to $k$, as though the iterate had some momentum pulling it in this direction. We want to analyze this in a little more detail in this problem.\\
+    Consider a general update of the form:
+    \begin{align}
+        \underline x_{k+1} = \underline x_k - \alpha_k \underline p_k
+        + \beta_k \underline q_k
+    \end{align}
+    where $p_k = \nabla_{\underline x}F(\underline x_k)$, and $q_k$ represents the additional modification to the descent direction we are going to make.
+\end{flushleft}
+
+
+\begin{tcolorbox}
+    \begin{flushleft}
+        \textbf{Question:}\\
+        \begin{itemize}
+            \item Show that:
+        \begin{align}
+            F(\underline x_{k+1}) = F(\underline x_{k}) + \frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline q_k
+        \end{align}
+        
+        From Taylor, we have:
+        \begin{align*}
+            F(\underline x + \underline \delta) = 
+            F(\underline x) + [\nabla_{\underline x} F(\underline x)]^T \underline \delta
+            + \frac{1}{2} \underline \delta^T H(\underline x) \underline \delta
+            + O(||\underline \delta||^3)
+        \end{align*}
+        And we have $H(\underline x) = Q$, $p_k = \nabla_{\underline x}F(\underline x_k)$, so: 
+        \begin{align*}
+             F(\underline x_{k+1}) &= F(\underline x_{k}) + p_k^T(-\alpha_k \underline p_k + \beta_k \underline q_k)
+             + \frac{1}{2} (-\alpha_k \underline p_k + \beta_k \underline q_k)^T Q (-\alpha_k \underline p_k + \beta_k \underline q_k)
+             + O(||\underline \delta||^3)
+             \\
+             &= F(\underline x_{k}) + \frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k
+        \end{align*}
+        \end{itemize}
+        
+    \end{flushleft}
+\end{tcolorbox}
+
+
+\begin{tcolorbox}
+    \textbf{Questions:}
+    \begin{itemize}
+        \item For standard Gradient Descent, taking $\beta_k = 0$, find an expression for the optimal step size $\alpha_k$ in terms of $\underline p_k$.
+        \\ \\     
+        We have already proved equation (5), so when we taking $\beta_k = 0$:  
+        \begin{align*}
+            F(\underline x_{k+1}) = 
+            F(\underline x_{k}) + \frac{1}{2} 
+            \alpha_k^2 \underline p_k^T Q \underline p_k
+            - \alpha_k \underline p_k^T \underline p_k
+        \end{align*}
+        In order to get the optimal step size $\Tilde{\alpha}_k$, we want:
+        \begin{align*}
+            \Tilde{\alpha}_k = \min_{\alpha_k}(\frac{1}{2} 
+            \alpha_k^2 \underline p_k^T Q \underline p_k
+            - \alpha_k \underline p_k^T \underline p_k)
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+
+
+\newpage
+
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item
+        So we let:
+        \begin{align*}
+            \Tilde{\alpha}_k = \alpha_k, \text{ when } 
+            \frac{\mathrm{d}
+            (\frac{1}{2} 
+            \alpha_k^2 \underline p_k^T Q \underline p_k
+            - \alpha_k \underline p_k^T \underline p_k)}
+            {\mathrm{d} \alpha_k}
+            =0
+        \end{align*}
+        \begin{align*}
+            &\Rightarrow \quad
+            \Tilde{\alpha}_k \underline p_k^T Q \underline p_k = \underline p_k^T \underline p_k
+            \\
+            &\Rightarrow \quad
+            \Tilde{\alpha}_k = 
+            \frac{\underline p_k^T \underline p_k}
+            {\underline p_k^T Q \underline p_k} 
+        \end{align*}
+    \end{enumerate}
+    \\
+    \begin{itemize}
+        \item For the general case, find an expression for the optimal stepsize $\alpha_k$ and generalized momentum factor $\beta_k$ in terms of $p_k$ and $q_k$.
+        \\
+        \\
+        From equation (5), we have:
+        \begin{align*}
+             F(\underline x_{k+1}) = F(\underline x_{k}) + \frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k
+        \end{align*}
+        In order to get the optimal step size $\Tilde{\alpha}_k$ and $\Tilde{\beta}_k$, we want:
+        \begin{align*}
+            \Tilde{\alpha}_k = \min_{\alpha_k}(\frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k)\\
+        \Tilde{\beta}_k = \min_{\beta_k}(\frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k)
+        \end{align*}
+        So we let:
+        \begin{align*}
+            \Tilde{\alpha}_k = \alpha_k, \text{ when } 
+            \frac{\mathrm{d}
+            (\frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k)}
+            {\mathrm{d} \alpha_k}
+            =0 \\
+            \Tilde{\beta}_k = \beta_k, \text{ when } 
+            \frac{\mathrm{d}
+            (\frac{1}{2} 
+            (\alpha_k^2 \underline p_k^T Q \underline p_k 
+            - 2\alpha_k\beta_k \underline p_k^T Q \underline q_k 
+            + \beta_k^2 \underline q_k^T Q \underline q_k)
+            - \alpha_k \underline p_k^T \underline p_k 
+            + \beta_k \underline q_k^T \underline p_k)}
+            {\mathrm{d} \beta_k}
+            =0 
+        \end{align*}
+        \begin{align*}
+            \Rightarrow \quad 
+            \begin{cases}
+             \Tilde{\alpha}_k \underline p_k^T Q \underline p_k - \Tilde{\beta}_k \underline p_k^T Q \underline q_k - \underline p_k^T \underline p_k &= 0\\
+             \Tilde{\beta}_k \underline q_k^T Q \underline q_k - \Tilde{\alpha}_k \underline p_k^T Q \underline q_k + \underline q_k^T \underline p_k &= 0
+            \end{cases}
+        \end{align*}
+            
+        \begin{align*}
+            \Rightarrow \quad
+                \Tilde{\alpha}_k &= \frac{\underline p_k^T \underline p_k \underline q_k^T Q \underline q_k - 
+                \underline q_k^T \underline p_k \underline p_k^T Q \underline q_k}
+                {\underline p_k^T Q \underline p_k \underline q_k^T Q \underline q_k - \underline p_k^T Q \underline q_k \underline p_k^T Q \underline q_k}\\
+                \Tilde{\beta}_k &= \frac{\underline p_k^T \underline p_k \underline p_k^T Q \underline q_k - 
+                \underline q_k^T \underline p_k \underline p_k^T Q \underline p_k}
+                {\underline p_k^T Q \underline p_k \underline q_k^T Q \underline q_k - \underline p_k^T Q \underline q_k \underline p_k^T Q \underline q_k}
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+\bigskip
+\begin{flushleft}
+    In the remainder of this problem, we want to experiment with the behavior of gradient descent and the modified momentum methods. To do so, we need a $Q$ and a $\underline c$.
+\end{flushleft}
+\begin{itemize}
+    \item Take $D = 10$
+
+    \item Write a function to generate a $D$-dimensional vector where each component is drawn from a standard normal distribution.
+
+    \item Use this function to generate $\underline c$.
+
+    \item Generate a $D \times D$ matrix $A$, where every column is a vector generated in this way.
+
+    \item Take $Q = A^TA$.
+\end{itemize}
+\begin{tcolorbox}
+    \textbf{Questions:}
+    \begin{itemize}
+        \item Explain why $Q$ is almost certainly positive definite when generated this way.
+        \\
+        \begin{flushleft}
+            For any $\underline x \not = 0$:
+            \begin{align*}
+                \underline x^T Q \underline x &= \underline x^T A^TA \underline x \\
+                &= (\underline x^T A^T)(A \underline x) \\
+                &= (A \underline x )^T(A \underline x)  \\
+                &= ||A \underline x ||_2^2 \geq 0
+            \end{align*}
+            \justifying
+            So we can state that $Q$ is positive definite except $A$ is not invertible. And $A$ being invertible means that A's collumn space is linearly dependent. The most possible situation is that one column of $A$ can be expressed by the other columns, of which the probability is $0$. We can think of it as the probability of randomly throwing a dart so that it hit on a lower dimensional span in a higher dimensional space. It's like the probability to randomly throw a dart exactly on a point of the dartborad, which is also $0$.
+            \\
+            \\
+            So we can claim that $Q$ is almost certainly positive definite when generated this way.
+        \end{flushleft}
+    \end{itemize}
+\end{tcolorbox}
+\bigskip
+\textbf{Gradient Descent}
+\begin{tcolorbox}
+    \textbf{Questions:}
+    \begin{itemize}
+        \item For an $\alpha > 0$ small enough to guarantee convergence, implement gradient descent for this problem. Plot the error of 
+        ${||}\underline x_k \text{ $-$ } \underline x^{*} {||}$, and show that it agrees with the exponential convergence we expect from the results in class. 
+        \textit{How can you verify this?}
+        \\
+        \begin{flushleft}
+            \justifying
+            In order to show generality, the experiments have been run 4 times.
+            And The plots of error ${||}\underline x_k \text{ $-$ } \underline x^{*} {||}$ are shown below:
+        \end{flushleft}
+        \begin{minipage}{0.4\textwidth}
+            \includegraphics[width=1\linewidth]{1}
+            \begin{center}
+                (a.1)
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.1\textwidth}
+            \begin{center}
+                
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.4\textwidth}
+                \includegraphics[width=1\linewidth]{3}
+                \begin{center}
+                (b.1)
+                \end{center}
+        \end{minipage}
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item 
+        \begin{minipage}{0.4\textwidth}
+            \includegraphics[width=1\linewidth]{5}
+            \begin{center}
+                (c.1)
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.1\textwidth}
+            \begin{center}
+                
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.4\textwidth}
+                \includegraphics[width=1\linewidth]{7}
+                \begin{center}
+                (d.1)
+                \end{center}
+        \end{minipage}
+        \item And from class, we expect the error to converge to $0$ with exponential speed, which means that ${||}\underline x_k \text{ $-$ } \underline x^{*} {||}$ behaves like an exponential function. So what we can do to verify this is to construct a exponential function $exp(x) = c * u^x$ by sampling two points from $error(k) = {||}\underline x_k \text{ $-$ } \underline x^{*} {||}$. Then we can plot both of them to see whether these two function behave the same.
+        \begin{minipage}{0.4\textwidth}
+            \includegraphics[width=1\linewidth]{2}
+            \begin{center}
+                (a.2)
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.1\textwidth}
+            \begin{center}
+                
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.4\textwidth}
+                \includegraphics[width=1\linewidth]{4}
+                \begin{center}
+                (b.2)
+                \end{center}
+        \end{minipage}
+
+        \begin{minipage}{0.4\textwidth}
+            \includegraphics[width=1\linewidth]{6}
+            \begin{center}
+                (c.2)
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.1\textwidth}
+            \begin{center}
+                
+            \end{center}
+        \end{minipage}
+        %%
+        \begin{minipage}{0.4\textwidth}
+                \includegraphics[width=1\linewidth]{8}
+                \begin{center}
+                (d.2)
+                \end{center}
+        \end{minipage}
+        We can conclude from plots above that the error ${||}\underline x_k \text{ $-$ } \underline x^{*} {||}$ agrees with the exponential convergence.
+    \end{enumerate}
+    \bigskip
+    \begin{itemize}
+        \item Additionally, we’d like to know in what manner the iterates converge to the minimum. In going from $\underline x_k$ to $\underline x_{k+1}$, are we aimed directly at the minimizer $\underline x^\ast$, or are we off slightly? We can understand this by looking at the angle between $\underline x_{k+1}-\underline x_k$ and $x^\ast - x_k$. To get at this angle, we can plot
+        \begin{align}
+            \frac{[\underline x_{k+1} - \underline x_k]^T [\underline x_\ast - \underline x_k]}
+            {||\underline x_{k+1} - \underline x_k|| ||\underline x_\ast - \underline x_k]||}
+        \end{align}
+        as a function of $k$. What does the plot suggest about how the iterates approach the minimizer?
+    \end{itemize}
+\end{tcolorbox}
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item The plot of the angle between $\underline x_{k+1}-\underline x_k$ and $x^\ast - x_k$ is showned below:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6cm]{9}
+        \end{center}
+        \begin{flushleft}
+        \justifying
+            What we can conclude from this is that: if we are far from the minimizer, the information of the first derivative won't directly guide the optimization step to the minimizer. However, when we keep approaching the minimum, the differences between the directions of optimization step and the directions aimed directly at the minimizer become smaller and smaller.
+        \end{flushleft}
+    \end{enumerate}
+    \bigskip
+    \begin{itemize}
+        \item Are the rates of convergence of the iterates and the behavior of the approach consistent across different starting points, stepsizes, and $Q, \underline c$ choices?
+        \\\\
+        If the starting points are very close to the minimizer, the optimization step may point directly to the minimizer. However, the rates of convergence of the iterates will not change across different starting points, stepsizes, and $Q, \underline c$ choices. This is because if the convergence is promised by a sufficiently small $\alpha$, the error will converge exponentially fast. 
+    \end{itemize}
+\end{tcolorbox}
+
+\begin{tcolorbox}
+    \textbf{Questions:}
+    \begin{itemize}
+        \item Instead of taking $\alpha$ as a constant, take $\alpha_k$ to be the optimal stepsize for gradient descent as found previously.
+        \item How does this change the rate of convergence? Be as specific as you can.
+        \\
+        Firstly what we can do is to plot two error histories using fixed and optimal $\alpha$ to see the difference between each rate of convergence:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6cm]{10}
+        \end{center}
+        As shown from the plot above, we can see that taking optimal stepsize does accerlate the converge dramatically. 
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item And more interestingly, if we try to plot the log of the errors, we get this:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.3cm]{11}
+        \end{center}
+        From this graph, we can see that the convergence of both methods converges exponentially fast in a more intuitive way. And by choosing the optimal stepsizes, we can get a smaller $u$ for the corresponding exponential function.
+    \end{enumerate}
+    \bigskip
+    \begin{itemize}
+        \item How does this change the angle of approach as the iterates converge to the minimum?
+        Similarly, let's look at the angle between $\underline x_{k+1}-\underline x_k$ and $x^\ast - x_k$:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.1cm]{12}
+        \end{center}
+        What we can get from this is that initially, the angle between $\underline x_{k+1}-\underline x_k$ and $x^\ast - x_k$ will shrink to a certain level and then begin oscillating within a range of which the angle is small. It's interesting that instead of directly aiming to the minimizer, the optimization step keep having a small oscillating angle with the direction that points to the minimum. It's like we are walking downhill by taking a rugged path.
+        \bigskip
+        \item Are these behaviors consistent?\\\\
+        From the plot above and many other experiments, I believe these oscillating behaviors are consistent. I guess we can interpret this by associating the strategy of taking optimal stepsize with greedy strategy: 
+        \\\\
+        We try to take the biggest descent step with the information of first and second derivative. However, we don't know the true direction between the current point to the minimizer, and we are ignoring the rest terms of the Taylor Expansion. So what happens here is that we overshoot because we are greedy and try to reach the maximum outcome with limited information. However, we can fix some of this overshoot in the next optimization step. And this is the explanation of the behavior of oscillating.
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+\textbf{Momentum}
+\\\\
+In this section, we include a momentum term, given by $\underline q_k = \underline x_k - \underline x_{k-1}$.
+\begin{tcolorbox}
+    \begin{itemize}
+        \item For a constant $\alpha > 0, \beta > 0$, plot the error $||\underline x_k \text{ - } \underline x^\ast ||$ as a function of k to show convergence. How can you find $\beta, \alpha$ to guarantee convergence? Are these the best constants you can find?
+        \\\\
+        In order to find the best constants, we need to understand how $\alpha$ and $\beta$ affects the error during the optimization:
+        \\\\
+        Firstly, we have:
+        \begin{align*}
+            \underline x_{k+1} = \underline x_k - \alpha(Q\underline x_k - c) + \beta(\underline x_k - \underline x_{k-1})
+        \end{align*}
+        if we think of $\underline x_k = \underline x^\ast + \underline e_k$, and $x^\ast = Q^{-1}\underline c$, we can organize above as:
+        \begin{align*}
+            \underline e_{k+1} &= \underline e_{k} - \alpha Q \underline e_k + \beta(\underline e_k - \underline e_{k-1}) \\
+             &= (I - \alpha Q + \beta I)\underline e_k - \beta \underline e_{k-1}
+        \end{align*}
+        rather than thinking of this as one vector equation, think of it as two:
+        \begin{align*}
+             &\underline e_{k+1} = (I - \alpha Q + \beta I)\underline e_k - \beta \underline e_{k-1} \\
+             &\underline e_k = 1 \underline e_k + 0 \underline e_{k-1}
+        \end{align*}
+        And think about $v_k$ as a vector:
+        \begin{align*}
+            \underline v_k = \begin{bmatrix}
+                \underline e_k \\
+                \underline e_{k-1}
+            \end{bmatrix}
+        \end{align*}
+        Then the above can be described as:
+        \begin{align*}
+            \underline v[k+1]= \begin{bmatrix}
+                (I - \alpha Q + \beta I) & - \beta I\\
+                I & 0
+            \end{bmatrix} \underline v_k
+        \end{align*}
+        where $\underline v_k$ is a vector with twice as many dimensions as $\underline e_k$ and the above is a matrix twice as big as $Q$ in each direction.
+        \\\\
+        And we can let:
+        \begin{align*}
+            A=
+            \begin{bmatrix}
+                (I - \alpha Q + \beta I) & - \beta I\\
+                I & 0
+            \end{bmatrix} 
+        \end{align*}
+        
+        In this case if we can find a basis constructed by $A$'s Eigenvectors, we can represent $v_0$ as:
+        \begin{align*}
+            \underline v_0 = a_1\underline g_1 + a_2\underline g_2 + \dots + a_d\underline g_d
+        \end{align*}
+        $g_i$ represents the Eigenvectors of $A$. And by doing this, we can represent $v_k$ as:
+        \begin{align*}
+            \underline v_k &= A^{k-1} \underline v_0 \\
+            &= a_1\lambda_1^{k-1}\underline g_1 + a_2\lambda_2^{k-1}\underline g_2 + \dots + a_d\lambda_d^{k-1}\underline g_d
+        \end{align*}
+        So if we can find $\alpha$ and $\beta$ that secure $\forall \lambda_i: -1<\lambda_i<1$, the convergence is promised.
+        \end{itemize}
+\end{tcolorbox}
+\newpage
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item So here I want to take a bold guess that the Eigenvectors of A are in term of:
+        \begin{align*}
+            \underline g_i = \begin{bmatrix}
+                 \underline z_i \\
+                \delta \underline z_i
+            \end{bmatrix}
+        \end{align*}
+        where $\delta$ is a unknown constant, and $\underline z_i$ represent the Eigenvector of Q. So we want:
+        \begin{align*}
+            A\underline g_i &= 
+            \begin{bmatrix}
+                (I - \alpha Q + \beta I)\underline z_i - \delta \beta I \underline z_i \\
+                \underline z_i
+            \end{bmatrix} \\
+            &= \begin{bmatrix}
+                (1 - \alpha \lambda_i' + \beta - \delta \beta) \underline z_i \\
+                \underline z_i
+            \end{bmatrix} \\
+            &= \lambda_i 
+            \begin{bmatrix}
+                \underline z_i \\
+                \delta \underline z_i
+            \end{bmatrix} \\
+            &= \lambda_i \underline g_i
+        \end{align*}
+        where the $\lambda_i'$ represent the Eigenvalue of Q corresponding to $\underline z_i$, and in order to established the equation above, we need:
+        \begin{align*}
+            \begin{cases}
+                1 - \alpha \lambda_i' + \beta - \delta \beta = \lambda_i
+                \\
+                1= \lambda_i \delta
+            \end{cases}
+        \end{align*}
+        so we have:
+        \begin{align*}
+            \beta \delta^2 -(1-\alpha \lambda_i' + \beta)\delta + 1 = 0
+        \end{align*}
+        And for $\delta$ to have two roots so that we can have a basis with $2D$ dimension, we need:
+        \begin{align*}
+            (1-\alpha \lambda_i' + \beta)^2 - 4\beta > 0
+        \end{align*}
+        Things get pretty messy if we want to continue our computation above, which is similar to what's in the Professors' note of "Convergence for Momentum Methods.pdf". And according to that, which limits the $\beta$ between $(0,1)$ and derives a range of $\alpha$ and $\beta$ that promises the convergence, all we have is a range or a relationship between $\alpha$ and $\beta$. They are not that helpful to formulate the final forms of the optimal constant $\alpha$ and $\beta$. 
+        \\\\
+        However, if we take a step back and look at the expression of the eigenvalues of $A$:
+        \begin{align*}
+            \lambda_i = 1 - \alpha \lambda_i' + \beta - \delta \beta
+        \end{align*}
+        We can think of this as searching the constrant minimum of:
+        \begin{align*}
+            \min(|\max_{i} \lambda_i &= 1 - \alpha \lambda_i' + \beta - \delta \beta|) \\
+            \text{s.t. } &\forall \lambda_i \in (0,1)
+        \end{align*}
+        So yes I think we can get the optimal constant $\alpha$ and $\beta$, but I don't think we should do that because it's like we are solving another much more complex problem to get the parameter for the original problem. It's more practical to just try different $\beta$ during optimizing.
+        \\\\
+        And the plots of the error when choosing different constant $\alpha$ and $\beta$ are shown in the next page.
+    \end{enumerate}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.1cm]{13}\\
+            (a) fix $\alpha = 0.01$
+    \end{center}
+    \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.1cm]{14}\\
+            (a) fix $\alpha = 0.05$
+    \end{center}
+    \begin{enumerate}[\quad\quad]
+        \item So the best pair of $\alpha$ and $\beta$ in my experiment is $\alpha=0.05$ and $\beta=0.5$. And of course we can find better $\alpha$ and $\beta$ with the cost of much more complex calculation.
+    \end{enumerate}
+    \bigskip
+    \begin{itemize}
+        \item For the best $\alpha$, $\beta$ you can find in the above question, what can you say about the rate of convergence, and how does it compare to gradient descent? Can you find $\alpha$ and $\beta$ to make the convergence rate better than vanilla gradient descent? How does it compare to optimized gradient descent?
+        \\\\
+        If we take the log of the error and plot it, we get:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.1cm]{15}
+        \end{center}
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item As shown as the plot, we can say that the momentum method follow the same exponential convergence as normal gradient descent. \\\\
+        And if we compare it with gradient descent we get:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=5cm]{16}\\
+            (a)
+        \end{center}
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=5cm]{17}\\
+            (b)
+        \end{center}
+        It surprised me so much that the momentum method has the fastest convergence. This is not intuitive because compared to momentum method trying to extract some second derivative information, optimal gradient descent do have the full access to the information to the second derivative.
+        \\\\
+        And more interestingly, if we use the optimal $\alpha$ and $\beta$ calculated every single step:
+         \begin{align*}
+                \Tilde{\alpha}_k = \frac{\underline p_k^T \underline p_k \underline q_k^T Q \underline q_k - 
+                \underline q_k^T \underline p_k \underline p_k^T Q \underline q_k}
+                {\underline p_k^T Q \underline p_k \underline q_k^T Q \underline q_k - \underline p_k^T Q \underline q_k \underline p_k^T Q \underline q_k}, \quad
+                \Tilde{\beta}_k = \frac{\underline p_k^T \underline p_k \underline p_k^T Q \underline q_k - 
+                \underline q_k^T \underline p_k \underline p_k^T Q \underline p_k}
+                {\underline p_k^T Q \underline p_k \underline q_k^T Q \underline q_k - \underline p_k^T Q \underline q_k \underline p_k^T Q \underline q_k}
+        \end{align*}
+        the error will converge to a very small value within several steps:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=5cm]{18}
+        \end{center}
+    \end{enumerate}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Again, plot the angle of approach to the minimizer for these momentum iterates. What can you say about the approach to the minimizer, and how does it compare to the previous results?
+        \\\\
+        Firstly, let's plot the angle  of approach to the minimizer for these momentum iterates:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=5.7cm]{19}
+        \end{center}
+        We can see that the momentum method behaves as the vanilla gradient descend: the angle between the optimization step and the direction of the minimizer decreases as the time of iteration increases.\\\\
+        However, if we compare the vanilla momentum with the vanilla gradient descent:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=6.1cm]{20}
+        \end{center}
+        We can see that the angle between the optimization step and the direction of the minimizer shrink faster, which means the momentum do help improve the direction choosing during optimization.
+        \\\\
+        \item Do the trends you observe above generalize, with $\alpha, \beta, Q, c$? How does vanilla momentum compare with vanilla gradient descent? With optimized gradient descent?
+        \\\\
+        Through a certain times of experiment and convergence analyse above, I think the behavior we observe generalize, with $\alpha, \beta, Q, c$. And from above, we have a surprising discovery that momentum method stands out among all the optimization methods we use.
+        \\
+        \item Repeat the above, but for optimized momentum, using the optimal stepsizes $\alpha_k, \beta_k$ from before.
+        \\\\
+        I think I've already include this part above, please refer to the discussion above.
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{flushleft}
+    \textbf{Is there a better direction?}
+\end{flushleft}
+
+\begin{flushleft}
+    \justifying
+    We can consider the effect of the momentum term of adding a little bit of movement in a direction other than just the gradient (or rather, the negative of the gradient). This widens the space of what the iterates can explore, and in that way it makes sense that it may discover better routes to the optimum. But is this the best approach? Ideally, we’d like to move as directly towards the minimizer as possible.
+\end{flushleft}
+
+\begin{tcolorbox}
+    \begin{itemize}
+        \item What would moving directly towards the minimizer as possible ‘look like’, in terms of the iterates? How does this compare to the behavior of gradient descent and momentum methods as above?
+        \\\\
+        I think if we can move directly towards the minimizer, the optimization speed will be boosted dramatically. And if we can do that, we can think of momentum methods as the same as the gradient descent but with a larger stepsize.
+    \end{itemize}
+\end{tcolorbox}
+An alternative approach we might take is to choose a direction $\underline q_k$ that is orthogonal to $\underline p_k$, and choose the stepsize and momentum factors to optimize motion in this orthogonal direction.
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Given a vector $\underline p_k$, how can we generate an $\underline q_k$ that is orthogonal to $\underline p_k$?
+        \\\\
+        All we know about orthogonal is that: $\underline p_k \cdot \underline q_k = 0$. So we can easily build a loop function to generate $\underline q_k$ easily:
+
+        \begin{algorithmic}[1]
+            \State $sum \gets 0$
+            \For {$i \text{ from } 1 \text{ to } D-1$}
+                \State $\underline q_k[i] \gets  Random()$
+                \State $sum \gets sum + \underline q_k[i] *\underline p_k[i]$
+            \EndFor
+            \State $\underline q_k[D] \gets \frac{-sum}{\underline p_k[D]}$
+            \State $\textbf{Return } \underline q_k$
+        \end{algorithmic}
+    \end{itemize}
+\end{tcolorbox}
+Constructing orthogonal $\underline q_k$ as above, we can implement this modified momentum descent.
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Implementing this modified momentum descent with optimal $\alpha_k, \beta_k$, how does this method of choosing $\underline q_k$ influence the convergence rate and the directions of approach? How does it compare with momentum methods generally?
+        \\\\
+        In order to learn about how choosing this orthogonal $\underline q_k$ influence the convergence, let's plot the error of it comparing to the other methods:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=5cm]{21}
+        \end{center}
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item As shown by the error plot, the first intuitive observation is that the orthogonal descent is faster than the optimal gradient descent, which is quite reasonable because if we set $\beta = 0$ in orthogonal descent it will become optimal gradient descent. And then we can see that orthogonal descent can perform as well as momentum descent when we fix $\alpha$ and $\beta$. However, the astonishing efficiency of the momentum descent with optimal $\alpha_k$ and $\beta_k$ is still untouchable. So yeah, maybe adding a orthogonal direction during the optimization may produce something useful, but we can conclude that the information catch by the original momentum direction is more useful.
+        \\\\
+        Then let's have a look of how this orthogonal direction influence the angle between the optimization step and the minimizer:
+        \begin{center}
+            \includegraphics[width=0.6\linewidth, height=7cm]{22}
+        \end{center}
+        We can see that there is a highly chaotic oscillation with the angle between the optimization step and the minimizer. And this oscillation is much more intense compare to the oscillation we observe in optimal vanilla gradient descent. I think this is reasonable to because we are adding a completely random orthogonal direction to the optimization step. The only thing we can control is the size of this random orthogonal direction. Without containing any information with the minimizer, it's reasonable that the angle between the optimization step and the minimizer will have a very intensive oscillation.
+    \end{enumerate}
+\end{tcolorbox}
+\bigskip
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Try to come up with a better way of generating an additional direction to move in. Note that you cannot use $x^\ast$ or $Q^{-1}$, since if we knew either of these, none of this would be necessary.
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\textbf{\large Problem 2: Branch and Bound}
+\begin{flushleft}
+    \justifying
+    Consider the following problem: find $x_1 , x_2 , . . . , x_10 \in \mathbb{Z}$ to maximize
+    \begin{align}
+        104x_1 + 128x_2 + 135x_3 + 139x_4 + 150x_5 + 153x_6 + 162x_7 + 168x_8 + 195x_9 + 198x_{10}
+    \end{align}
+    such that
+    \begin{align}
+        9x^2_1 +8x^2_2 +7x^2_3 +7x^2_4 +6x^2_5 +6x^2_6 +5x^2_7 +2x^2_8 +x^2_9 +x^2_{10} \leq 68644
+    \end{align}
+    Note that since we want to maximize over the integers, most of our usual approaches are not going to work - no
+    derivatives, no continuity.
+\end{flushleft}
+\begin{flushleft}
+    However, our usual approach can still provide useful information. Because the real numbers contain the integers, the solution to the above problem over the reals must necessarily be greater than or equal to the solution over the integers. This provides a convenient upper bound on possible solutions to the problem we’re actually interested in.
+\end{flushleft}
+\begin{tcolorbox}
+    \begin{itemize}
+        \item What is the solution to the above problem, when the $x_i$ are taken to be real values instead of integers? Show your work.
+        \\\\ There is only one inequality constraint of the problem, so let's try to solve the question using the duality method. We have:
+        \begin{align*}
+            F(\underline x) &= -(104x_1 + 128x_2 + 135x_3 + 139x_4 + 150x_5 + 153x_6 + 162x_7 + 168x_8 + 195x_9 + 198x_{10})\\
+            g(\underline x) &= 9x^2_1 +8x^2_2 +7x^2_3 +7x^2_4 +6x^2_5 +6x^2_6 +5x^2_7 +2x^2_8 +x^2_9 +x^2_{10} - 68644
+        \end{align*}
+        Then we can construct $L(\underline x, \mu)$ with ($\mu>0$) that:
+        \begin{align*}
+            L(\underline x, \mu) &= 
+            -(104x_1 + 128x_2 + 135x_3 + 139x_4 + 150x_5 + 153x_6 + 162x_7 + 168x_8 + 195x_9\\ &\quad + 198x_{10})
+            + \mu(9x^2_1 +8x^2_2 +7x^2_3 +7x^2_4 +6x^2_5 +6x^2_6 +5x^2_7 +2x^2_8 +x^2_9 +x^2_{10} \\ &\quad - 68644)
+        \end{align*}
+        It's easy to see that the Hessian of $L(\underline x, \mu)$ is positive definite, which promise that $L(\underline x, \mu)$ has a global minimum when $\nabla_{\underline x} L(\underline x, \mu) = 0$. So, we can try to convert the problem of searching the minimum of $F(\underline x)$ to searching the maximum of $L(\underline x, \mu)$ when $\nabla_{\underline x} L(\underline x, \mu) = 0$.
+        \\\\
+        Let $Q(\mu) = \min_{\underline x} L(\underline x, \mu)$, then we have:
+        \begin{align*}
+            x_1 = \frac{104}{18\mu}, x_2 = \frac{128}{16\mu}, x_3 = \frac{135}{14\mu}, x_4 = \frac{139}{14\mu}, x_5 = \frac{150}{12\mu}, \\x_6 = \frac{153}{12\mu}, 
+            x_7 = \frac{162}{10\mu}, x_8 = \frac{168}{4\mu}, x_9 = \frac{195}{2\mu}, x_{10} = \frac{198}{2\mu}
+        \end{align*}
+        \begin{align*}
+            \Rightarrow \quad Q(\mu) &= -(104 * \frac{104}{18\mu} + 128 * \frac{128}{16\mu} + 135 * \frac{135}{14\mu} + 139 * \frac{139}{14\mu} + 150 * \frac{150}{12\mu} + 153 * \frac{153}{12\mu} \\ &\quad + 162 * \frac{162}{10\mu} + 168 * \frac{168}{4\mu} + 195 * \frac{195}{2\mu} + 198 * \frac{198}{2\mu}) + \mu(9 * (\frac{104}{18\mu})^2 + 8 * (\frac{128}{16\mu})^2 \\& \quad + 7* (\frac{135}{14\mu})^2 + 7 * (\frac{139}{14\mu})^2 + 6 * (\frac{150}{12\mu})^2 + 6 * (\frac{153}{12\mu})^2 + 5 * (\frac{162}{10\mu})^2 + 2 * (\frac{168}{4\mu})^2 \\ &\quad + 1 * (\frac{195}{2\mu})^2 + 1 * (\frac{198}{2\mu})^2 - 68644)
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad\quad]
+        \item So we have:
+        \begin{align*}
+            Q(\mu) = -28213.698015873015 * \frac{1}{\mu} - 68644\mu
+        \end{align*}
+        And for functions in terms of $f(x) = -(\frac{a}{x} + bx)$, we know they have a global maximum when $f'(x) = 0$ if $x>0$. So, if we take $Q'(\mu)=0$, we get:
+        \begin{align*}
+            \frac{28213.698015873015}{{\mu^\ast}^2} - 68644 = 0
+            \\
+            \Rightarrow \quad \mu^\ast = 0.6411043379183128 
+        \end{align*}
+        So we have:
+        \begin{align*}
+            \max_{\mu} Q(\mu) = Q(\mu^\ast) = -88015.93234412931
+        \end{align*}
+        And we can verify whether there is duality gap by checking whether this result satisfies $g(\underline x^\ast) \leq 0$. By representing $x^\ast$ with $\mu^\ast$, we get:
+        \begin{align*}
+            g(\underline x^\ast) &= 
+            \mu^\ast(9 * (\frac{104}{18\mu^\ast})^2 + 8 * (\frac{128}{16\mu^\ast})^2 + 7* (\frac{135}{14\mu^\ast})^2 + 7 * (\frac{139}{14\mu^\ast})^2 + 6 * (\frac{150}{12\mu^\ast})^2 + 6 * (\frac{153}{12\mu^\ast})^2 \\ &\quad + 5 * (\frac{162}{10\mu^\ast})^2 + 2 * (\frac{168}{4\mu^\ast})^2 + 1 * (\frac{195}{2\mu^\ast})^2 + 1 * (\frac{198}{2\mu^\ast})^2 - 68644)\\
+            &= -9.329295977925544 * e^{-12}
+        \end{align*}
+        So there is no duality gap. The maximum solution of the original problem is $88015.93234412931$
+    \end{enumerate}
+\end{tcolorbox}
+\begin{flushleft}
+    \justifying
+    Additionally, note that any choice of integer values for $x_1, x_2, \dots, x_{10}$ necessarily provides a \textit{lower bound} on the above problem - the maximum value must be better than the result of any arbitrary choice of integers we make. If choosing integer values is done in an efficient way, such as greedily, this can generate useful lower bounds on the problem we’re actually interested in. Obviously, the larger the lower bound, the better.
+\end{flushleft}
+\begin{tcolorbox}
+    \begin{itemize}
+        \justifying
+        \item Generate a greedy variable assignment to try to get a good lower bound on the value of the maximum for this problem. The larger this bound, the better. \\\\
+        To get a good lower bound, all we need to do is to assign $x_i$ with the floor integer of their real solutions:
+        \begin{align*}
+            x_i = \lfloor x_i^\ast \rfloor
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+\begin{flushleft}
+    \justifying
+    Now to solve the original problem, we could potentially brute force it, looping over every possible feasible value for each variable. But the above results suggest a potentially better approach.
+\end{flushleft}
+\begin{flushleft}
+    \justifying 
+    \textbf{A Branch and Bound Algorithm} attempts to solve this kind of optimization problem by traversing the tree of possible variable assignments, using the following observations:
+    \begin{itemize}
+        \item At any time, suppose we have a partial assignment of variables, and an upper and lower bound on the value the maximum attains.
+        \item If we relax the remaining variables to be real valued, and solve for the maximum, if the result falls below the lower bound \textit{there is no way to complete the variable assignment with integers that will surpass the lower bound}.
+        \item In this case, we know immediately that the partial assignment must be incorrect, and we can backtrack.
+        \item If we complete a variable assignment, and the result gives a value above the lower bound, then this variable assignment provides a \textit{better} lower bound for the full problem, and we can utilize it moving forward.
+    \end{itemize}
+\end{flushleft}
+\begin{flushleft}
+    \justifying
+    Applying these ideas recursively, we can test assignments for some variables, determine whether they are feasible, and either explore deeper, or backtrack and test other values for variable assignment. This lets us prune the space of possible variable assignments down, and efficiently identify a maximizing assignment.
+\end{flushleft}
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Giving a partial assignment of variables, the above problem will reduce to something of the form: maximize
+        \begin{align}
+            \sum_{i=1}^n \alpha_i z_i
+        \end{align}
+        subject to
+        \begin{align}
+            \sum_{i=1}^n \beta_i z_i^2 \leq R^2
+        \end{align}
+        where $z_1,z_2,\dots,z_n \in \mathbb{Z}$. \\
+        Consider the relaxation of this to $z_i \in R$, and solve for the constrained maximum in terms of ${\alpha_i}, {\beta_i}, R$.
+        \\\\
+        Firstly, let $\{x_1,x_2,\dots,x_j \} \in X$ that $x_i$ has already assigned with integers, and let $\{y_1,y_2,\dots,y_k \} \in Y$ that $y_i$ is the variable that we relax at this stage. Noted that $X \cap Y = \emptyset, X \cup Y = Z$. And if we let:
+        \begin{align*}
+            R' = R^2 - \sum_{i=1}^j \beta_i x_i^2 
+        \end{align*}
+        Then the original problem is converted to minimizing:
+        \begin{align*}
+            -\sum_{i=1}^k \alpha_i y_i
+        \end{align*}
+        subject to
+        \begin{align*}
+            \sum_{i=1}^k \beta_i y_i^2 \leq R'
+        \end{align*}
+        And if we try to solve this using duality method, we have:
+        \begin{align*}
+            L(\underline y,\mu) =  -\sum_{i=1}^k \alpha_i y_i + \mu \sum_{i=1}^k \beta_i y_i^2 - \mu * R'
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad \quad]
+        \item And if we let:
+        \begin{align*}
+            \underline \alpha = \begin{bmatrix}
+                \alpha_1 \\
+                \alpha_2 \\
+                \dots \\
+                \alpha_k
+            \end{bmatrix}, \quad
+            B = \begin{bmatrix} 
+    	   \beta_1 & 0 & \cdots & 0 \\
+    	   0 & \beta_1 & \cdots & 0 \\
+    	   \vdots & \vdots & \ddots & \vdots \\
+    	   0 & 0 & \cdots & \beta_k 
+    	\end{bmatrix}, \quad 
+            \underline y = \begin{bmatrix}
+                y_1 \\
+                y_2 \\
+                \dots \\
+                y_k
+            \end{bmatrix}
+        \end{align*}
+        we have:
+        \begin{align*}
+            &L(\underline y,\mu) = - \underline \alpha^T \underline y + \mu \underline y^T B \underline y - \mu * R'
+            \\
+            \Rightarrow \quad &\nabla_{\underline y} L(\underline y, \mu) = -\underline \alpha + 2\mu B\underline y
+        \end{align*}
+        Then if we set $\nabla_{\underline y} L(\underline y, \mu) = 0$, we have:
+        \begin{align*}
+            \underline y^\ast = \frac{B^{-1} \alpha}{2\mu} 
+        \end{align*}
+        then we let:
+        \begin{align*}
+            Q(\mu) &= \min_{\underline y} L(\underline y,\mu) \\
+            &= L(\underline y^\ast,\mu) \\
+            &= - \frac{\underline \alpha^T B^{-1} \underline \alpha}{2\mu} + 
+            \frac{\underline \alpha^T B^{-1}^T B B^{-1} \underline \alpha}
+            {4\mu} - \mu * R' \\
+            &= - \frac{\underline \alpha^T B^{-1} \underline \alpha}{2\mu} + 
+            \frac{\underline \alpha^T B^{-1} \underline \alpha}
+            {4\mu} - \mu * R' \\
+            &= - \frac{\underline \alpha^T B^{-1} \underline \alpha}{4\mu} - \mu * R'
+        \end{align*}
+        Note that here we assume all $\beta_k \not = 0$ so that $B$ is invertible. Then we have:
+        \begin{align*}
+            Q'(\mu) = \frac{\underline \alpha^T B^{-1} \underline \alpha}{4\mu^2} - R'
+        \end{align*}
+        If we set $Q'(\mu) = 0 \quad (\mu \geq 0)$, we get:
+        \begin{align*}
+            \mu^\ast = \sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}} 
+        \end{align*}
+        Then if we plug this $\mu^\ast$ back to $Q(\mu)$, we get a probable solution $S$ for the problem:
+        \begin{align*}
+            S &= -Q(\mu^\ast) \\
+            &=  \frac{\underline \alpha^T B^{-1} \underline \alpha}{4\sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}}} 
+            + \sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}}   * R' \\
+            &= \sqrt{R' \underline \alpha^T B^{-1} \underline \alpha}
+        \end{align*}
+        The last thing we need to do is to evaluate whether this solution satisfies the constraint.
+    \end{enumerate}
+\end{tcolorbox}
+
+\newpage
+
+\begin{tcolorbox}
+    \begin{enumerate}[\quad \quad]
+        \item By replacing $\underline y$ with $\mu^\ast$, we can represent the primal constraint as:
+        \begin{align*}
+            \sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}} * 
+            (\frac{B^{-1} \alpha}{2\sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}}})^T
+            B
+            (\frac{B^{-1} \alpha}{2\sqrt{\frac{\underline \alpha^T B^{-1} \underline \alpha}{4R'}}})
+            \leq R'
+        \end{align*}
+        After simplifying the gross thing above, we can simplify this as evaluating whether:
+        \begin{align*}
+            \sqrt{\alpha^T B^{-1} \alpha } \leq 
+            2\sqrt{R'}
+        \end{align*}
+    \end{enumerate}
+\end{tcolorbox}
+
+\bigskip
+
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Describe a way to efficiently generate an assignment of values to the variables to give a lower bound on the value of this maximum. The larger the bound the better, but not at the cost of efficiency.
+        \\\\
+        From the last question, we get a very beautiful representation of the maximum value $S$ while fixing $X$, and relaxing $Y$:
+        \begin{align*}
+            S = \sqrt{R' \underline \alpha^T B^{-1} \underline \alpha}
+        \end{align*}
+        So assuming at this stage we are at the tree node of fixing $x_i$ is some constant integer, what we can do here is to compare $S$ to the lower bound $O$ we obtained before and generate an assignment of $x_i$ as:
+        \begin{align*}
+            \begin{cases}
+                O > S, \quad \text{Prun all the children of $x_i$, and back track to it's parent node to continue searching} \\
+                O < S, \quad \text{Sign $O = S$ and keep searching by go to the next level of the searching tree}
+            \end{cases}
+        \end{align*}
+    \end{itemize}
+\end{tcolorbox}
+
+\bigskip
+
+\begin{tcolorbox}
+    \begin{itemize}
+        \item Using the above solutions, implement a branch and bound algorithm to solve the original problem. What is the maximum value? How many complete variable assignments did you have to visit in order to discover the optimum?
+        \\\\
+        The implementation of the algorithm is integrated in the \textbf{"Branch and Bound.py"}. The maximum value is $88011$, and the optimal $\underline x^\ast = [9 , 13 , 15 , 16 , 20 , 20 , 25 , 65 ,152, 154]^T$. In order to discover the optimum, I have to make $23007$ complete variable assignments. The output of the algorithm is shown below:
+        \begin{center}
+            \includegraphics[width=1\linewidth, height=4cm]{23}
+        \end{center}
+    \end{itemize}
+\end{tcolorbox}
+\end{document}
